@@ -6,10 +6,11 @@ import (
 	"time"
 	"net"
 	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
 )
 
 func main() {
-	conn, err := icmp.ListenPacket("udp4", "59.84.10.80:55555")
+	conn, err := icmp.ListenPacket("udp4", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,15 +18,16 @@ func main() {
 	defer conn.Close()
 	fmt.Println("connection success")
 
-	em := icmp.Echo {
+	echo := icmp.Echo {
 		ID: 123,
 		Seq: 1,
 		Data: []byte(""),
 	}
 
-	eb, err := em.Marshal(0)
-	if err != nil {
-		log.Fatal(err)
+	message := icmp.Message {
+		Type: ipv4.ICMPTypeEcho,
+		Code: 0,
+		Body: &echo,
 	}
 
 	destAddr, err:= net.ResolveUDPAddr("udp4", "142.251.42.142:80")
@@ -34,7 +36,8 @@ func main() {
 	}
 	fmt.Println("resolve domain to ip addr")
 
-	_, err = conn.WriteTo(eb, destAddr)
+	mb, _ := message.Marshal(nil)
+	_, err = conn.WriteTo(mb, destAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
