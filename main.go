@@ -9,19 +9,18 @@ import (
 )
 
 func main() {
-	// destUrl := "142.250.191.68" // www.google.com ip address
-
-	conn, err := icmp.ListenPacket("udp4", "aaaa:55555")
+	conn, err := icmp.ListenPacket("udp4", "59.84.10.80:55555")
 	if err != nil {
 		log.Fatal(err)
 	}
 	conn.SetDeadline(time.Now().Add(time.Minute))
 	defer conn.Close()
+	fmt.Println("connection success")
 
 	em := icmp.Echo {
 		ID: 123,
 		Seq: 1,
-		Data: []byte("hello"),
+		Data: []byte(""),
 	}
 
 	eb, err := em.Marshal(0)
@@ -29,15 +28,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	destAddr, err:= net.ResolveUDPAddr("upd4", "https://www.google.com")
+	destAddr, err:= net.ResolveUDPAddr("udp4", "142.251.42.142:80")
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("resolve domain to ip addr")
 
 	_, err = conn.WriteTo(eb, destAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("end to send")
 
 	outByte := make([]byte, 1024)
 	_, readAddr, err := conn.ReadFrom(outByte)
